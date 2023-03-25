@@ -1,7 +1,7 @@
 /* eslint-disable */
 import {useParams} from "react-router-dom";
 import styled from 'styled-components'
-import {useContext, useEffect, useState} from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import {Nav} from "react-bootstrap";
 import {Context1} from '../App'
 import {cartAdd} from "../store";
@@ -33,6 +33,9 @@ function Detail(props) {
     let [tab, setTab] = useState(0)
     let [fadeDetail, setFadeDetail] = useState('');
     let dispatch = useDispatch();
+    const cartRef = useRef(state.cart);
+
+
 
     useEffect(()=>{
 
@@ -67,6 +70,8 @@ function Detail(props) {
 
     let foundShoes = props.shoes.find(x=>{return x.id == id})
 
+
+
     useEffect(()=>{
         let arr = localStorage.getItem('watched');
         arr = JSON.parse(arr);
@@ -75,10 +80,15 @@ function Detail(props) {
         localStorage.setItem('watched', arr)
     }, [])
 
+    useEffect(()=>{
+        cartRef.current = state.cart
+    },[state.cart])
+
 
 
     return (
         <div className={`container start ${fadeDetail}`}>
+            {console.log('후우2', Array.isArray(cartRef.current))}
             {
                 alert === true
                 ? <div className={'alert alert-warning'}>3초 이내 구매시 할인</div>
@@ -98,7 +108,7 @@ function Detail(props) {
                     <h4 className="pt-5">{foundShoes.title}</h4>
                     <p>{foundShoes.content}</p>
                     <p>{foundShoes.price}원</p>
-                    <button className="btn btn-danger" onClick={async () => {
+                    <button className="btn btn-danger" onClick={() => {
                         dispatch((cartAdd(foundShoes)));
                         // for(let i =0 ; i<10000; i++){
                         //     let a = 0;
@@ -107,10 +117,14 @@ function Detail(props) {
                         // console.log( state.cart.find(x=>x.id === foundShoes.id))
                         // console.log( state.cart)
                         // window.alert('장바구니에 ' + foundShoes.title + ' 물품이 ' + (state.cart.find(x=>x.id === foundShoes.id).count + 1 ) + '개 담겨있습니다.');
-                        window.alert(`장바구니에 "${foundShoes.title}" 신발이 ${state.cart.find(x=>x.id === foundShoes.id).count + 1}개 담겨있습니다.`);
+
+                        setTimeout(()=>{
+                            window.alert(`장바구니에 "${foundShoes.title}" 신발이 ${ cartRef.current.find( x => x.id === foundShoes.id).count }개 담겨있습니다.`);
+                        },1)
+
                         // console.log(foundShoes);
                     }}>주문하기</button>
-                    <button onClick={()=>{console.log( state.cart.find(x=>x.id === foundShoes.id))}}>test</button>
+                    <button onClick={()=>{console.log( cartRef.current.find(x=>x.id === foundShoes.id).count)}}>test</button>
                 </div>
             </div>
 
